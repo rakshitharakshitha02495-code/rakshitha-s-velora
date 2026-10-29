@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopEasy | Login</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:#f4f6f8;color:#333;line-height:1.6}
+header{background:#1e293b;color:#fff;padding:14px 30px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;flex-wrap:wrap}
+.logo{font-size:1.5rem;color:#fbbf24}
+nav a{color:#fff;text-decoration:none;margin-left:18px}
+nav a:hover,nav a.active{color:#fbbf24}
+.badge{background:#ef4444;border-radius:50%;padding:1px 7px;font-size:.8rem}
+main{max-width:1000px;margin:25px auto;padding:0 20px;min-height:60vh}
+.btn{background:#f59e0b;color:#fff;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:1rem}
+.btn:hover{background:#d97706}
+footer{background:#1e293b;color:#fff;text-align:center;padding:15px;margin-top:30px}
+.box{max-width:400px;margin:30px auto;background:#fff;padding:30px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+form{display:flex;flex-direction:column;gap:12px;margin-top:15px}
+input{padding:10px;border:1px solid #ccc;border-radius:6px;font-size:1rem}
+.error{color:#c62828;font-size:.9rem}
+.success{color:#16a34a;font-weight:bold}
+.switch{margin-top:15px;text-align:center}
+.switch a{color:#f59e0b;cursor:pointer;text-decoration:underline}
+#welcome{display:none;text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🛒 ShopEasy</div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="products.html">Products</a>
+    <a href="cart.html">Cart <span class="badge" id="cart-count">0</span></a>
+    <a href="login.html" class="active">Login</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+
+<main>
+  <div class="box" id="authBox">
+    <h2 id="title">Login</h2>
+    <form id="form" novalidate>
+      <input type="text" id="name" placeholder="Full Name" style="display:none">
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="password" placeholder="Password (min 6 characters)">
+      <p class="error" id="error"></p>
+      <p class="success" id="ok"></p>
+      <button type="submit" class="btn" id="submitBtn">Login</button>
+    </form>
+    <p class="switch" id="switch">New here? <a id="toggle">Create an account</a></p>
+  </div>
+
+  <div class="box" id="welcome">
+    <h2>Welcome, <span id="user"></span>!</h2><br>
+    <button class="btn" id="logout">Logout</button>
+  </div>
+</main>
+
+<footer><p>&copy; 2026 ShopEasy. All rights reserved.</p></footer>
+
+<script>
+const getCart=()=>JSON.parse(localStorage.getItem('cart')||'[]');
+function updateCount(){const el=document.getElementById('cart-count');if(el)el.textContent=getCart().reduce((s,i)=>s+i.qty,0);}
+updateCount();
+
+let mode='login';
+const $=id=>document.getElementById(id);
+const users=()=>JSON.parse(localStorage.getItem('users')||'[]');
+
+function showWelcome(){
+  const u=JSON.parse(localStorage.getItem('currentUser')||'null');
+  $('authBox').style.display=u?'none':'block';
+  $('welcome').style.display=u?'block':'none';
+  if(u) $('user').textContent=u.name;
+}
+showWelcome();
+
+$('toggle').onclick=()=>{
+  mode=mode==='login'?'register':'login';
+  const reg=mode==='register';
+  $('title').textContent=reg?'Create Account':'Login';
+  $('submitBtn').textContent=reg?'Register':'Login';
+  $('name').style.display=reg?'block':'none';
+  $('switch').innerHTML=reg?'Already have an account? <a id="toggle2">Login</a>':'New here? <a id="toggle2">Create an account</a>';
+  $('toggle2').onclick=$('toggle').onclick;
+  $('error').textContent='';$('ok').textContent='';
+};
+
+$('form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const name=$('name').value.trim(),email=$('email').value.trim(),pw=$('password').value;
+  $('error').textContent='';$('ok').textContent='';
+
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){$('error').textContent='Enter a valid email.';return;}
+  if(pw.length<6){$('error').textContent='Password must be at least 6 characters.';return;}
+
+  if(mode==='register'){
+    if(!name){$('error').textContent='Enter your name.';return;}
+    if(users().some(u=>u.email===email)){$('error').textContent='Email already registered.';return;}
+    const list=users();list.push({name,email,pw});
+    localStorage.setItem('users',JSON.stringify(list));
+    $('ok').textContent='Account created! You can now login.';
+  }else{
+    const u=users().find(u=>u.email===email&&u.pw===pw);
+    if(!u){$('error').textContent='Invalid email or password.';return;}
+    localStorage.setItem('currentUser',JSON.stringify(u));
+    showWelcome();
+  }
+});
+
+$('logout').onclick=()=>{localStorage.removeItem('currentUser');location.reload();};
+</script>
+</body>
+</html>
