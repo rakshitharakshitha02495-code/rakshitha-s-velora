@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopEasy | Contact</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:#f4f6f8;color:#333;line-height:1.6}
+header{background:#1e293b;color:#fff;padding:14px 30px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;flex-wrap:wrap}
+.logo{font-size:1.5rem;color:#fbbf24}
+nav a{color:#fff;text-decoration:none;margin-left:18px}
+nav a:hover,nav a.active{color:#fbbf24}
+.badge{background:#ef4444;border-radius:50%;padding:1px 7px;font-size:.8rem}
+main{max-width:1000px;margin:25px auto;padding:0 20px;min-height:60vh}
+.btn{background:#f59e0b;color:#fff;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:1rem}
+.btn:hover{background:#d97706}
+footer{background:#1e293b;color:#fff;text-align:center;padding:15px;margin-top:30px}
+.wrap{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:700px){.wrap{grid-template-columns:1fr}}
+.box{background:#fff;padding:25px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+form{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+input,textarea{padding:10px;border:1px solid #ccc;border-radius:6px;font-size:1rem;font-family:inherit}
+.error{color:#c62828;font-size:.9rem}
+.success{color:#16a34a;font-weight:bold}
+.faq h4{cursor:pointer;margin-top:12px}
+.faq p{display:none;color:#555}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🛒 ShopEasy</div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="products.html">Products</a>
+    <a href="cart.html">Cart <span class="badge" id="cart-count">0</span></a>
+    <a href="login.html">Login</a>
+    <a href="contact.html" class="active">Contact</a>
+  </nav>
+</header>
+
+<main>
+  <h2 style="margin-bottom:15px">Contact Us</h2>
+  <div class="wrap">
+    <div class="box">
+      <h3>Send a Message</h3>
+      <form id="form" novalidate>
+        <input type="text" id="name" placeholder="Your Name">
+        <input type="email" id="email" placeholder="Your Email">
+        <textarea id="message" rows="5" placeholder="Your Message"></textarea>
+        <p class="error" id="error"></p>
+        <p class="success" id="ok"></p>
+        <button type="submit" class="btn">Send</button>
+      </form>
+    </div>
+    <div class="box faq">
+      <h3>FAQs</h3>
+      <h4>▸ How long does delivery take?</h4>
+      <p>Usually 3–5 working days.</p>
+      <h4>▸ Can I return a product?</h4>
+      <p>Yes, within 7 days of delivery.</p>
+      <h4>▸ Which payment methods are accepted?</h4>
+      <p>Cash on Delivery, UPI and Cards.</p>
+    </div>
+  </div>
+</main>
+
+<footer><p>&copy; 2026 ShopEasy. All rights reserved.</p></footer>
+
+<script>
+const getCart=()=>JSON.parse(localStorage.getItem('cart')||'[]');
+function updateCount(){const el=document.getElementById('cart-count');if(el)el.textContent=getCart().reduce((s,i)=>s+i.qty,0);}
+updateCount();
+
+// FAQ toggle
+document.querySelectorAll('.faq h4').forEach(h=>{
+  h.addEventListener('click',()=>{
+    const p=h.nextElementSibling;
+    p.style.display=p.style.display==='block'?'none':'block';
+  });
+});
+
+// Contact form validation
+document.getElementById('form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const name=document.getElementById('name').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const msg=document.getElementById('message').value.trim();
+  const err=document.getElementById('error'),ok=document.getElementById('ok');
+  err.textContent='';ok.textContent='';
+
+  if(!name||!email||!msg){err.textContent='All fields are required.';return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){err.textContent='Enter a valid email.';return;}
+  ok.textContent='Thank you, '+name+'! We will get back to you soon.';
+  e.target.reset();
+});
+</script>
+</body>
+</html>
