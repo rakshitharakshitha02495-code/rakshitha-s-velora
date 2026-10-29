@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopEasy | Home</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:#f4f6f8;color:#333;line-height:1.6}
+header{background:#1e293b;color:#fff;padding:14px 30px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;flex-wrap:wrap}
+.logo{font-size:1.5rem;color:#fbbf24}
+nav a{color:#fff;text-decoration:none;margin-left:18px}
+nav a:hover,nav a.active{color:#fbbf24}
+.badge{background:#ef4444;border-radius:50%;padding:1px 7px;font-size:.8rem}
+main{max-width:1100px;margin:25px auto;padding:0 20px;min-height:60vh}
+.btn{background:#f59e0b;color:#fff;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:1rem;text-decoration:none;display:inline-block}
+.btn:hover{background:#d97706}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px}
+.card{background:#fff;border-radius:10px;padding:20px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.card .img{font-size:4rem}
+.price{color:#16a34a;font-weight:bold;margin:6px 0}
+footer{background:#1e293b;color:#fff;text-align:center;padding:15px;margin-top:30px}
+.hero{background:linear-gradient(135deg,#1e293b,#334155);color:#fff;text-align:center;padding:70px 20px;border-radius:12px;margin-bottom:30px}
+.hero h2{font-size:2.2rem;margin-bottom:10px}
+.hero p{margin-bottom:20px}
+h3.title{margin:25px 0 15px}
+.cats{display:flex;gap:15px;flex-wrap:wrap}
+.cats a{flex:1;min-width:150px;background:#fff;padding:20px;text-align:center;border-radius:10px;text-decoration:none;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.cats a:hover{background:#fef3c7}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🛒 ShopEasy</div>
+  <nav>
+    <a href="index.html" class="active">Home</a>
+    <a href="products.html">Products</a>
+    <a href="cart.html">Cart <span class="badge" id="cart-count">0</span></a>
+    <a href="login.html">Login</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <h2>Big Sale – Up to 50% Off!</h2>
+    <p>Best deals on electronics, fashion and accessories.</p>
+    <a href="products.html" class="btn">Shop Now</a>
+  </section>
+
+  <h3 class="title">Categories</h3>
+  <div class="cats">
+    <a href="products.html?cat=Electronics">💻 Electronics</a>
+    <a href="products.html?cat=Fashion">👕 Fashion</a>
+    <a href="products.html?cat=Accessories">⌚ Accessories</a>
+  </div>
+
+  <h3 class="title">Featured Products</h3>
+  <div class="grid" id="featured"></div>
+</main>
+
+<footer><p>&copy; 2026 ShopEasy. All rights reserved.</p></footer>
+
+<script>
+const getCart=()=>JSON.parse(localStorage.getItem('cart')||'[]');
+const saveCart=c=>{localStorage.setItem('cart',JSON.stringify(c));updateCount();};
+function updateCount(){const el=document.getElementById('cart-count');if(el)el.textContent=getCart().reduce((s,i)=>s+i.qty,0);}
+function addToCart(p){const c=getCart();const f=c.find(i=>i.id===p.id);f?f.qty++:c.push({...p,qty:1});saveCart(c);alert(p.name+' added to cart');}
+updateCount();
+
+const featured=[
+  {id:1,name:'Smartphone',price:14999,img:'📱'},
+  {id:2,name:'Headphones',price:1999,img:'🎧'},
+  {id:3,name:'Sneakers',price:2499,img:'👟'},
+  {id:4,name:'Smart Watch',price:3499,img:'⌚'}
+];
+const box=document.getElementById('featured');
+featured.forEach(p=>{
+  const d=document.createElement('div');
+  d.className='card';
+  d.innerHTML=`<div class="img">${p.img}</div><h4>${p.name}</h4><div class="price">₹${p.price}</div>`;
+  const b=document.createElement('button');
+  b.className='btn';b.textContent='Add to Cart';
+  b.onclick=()=>addToCart(p);
+  d.appendChild(b);box.appendChild(d);
+});
+</script>
+</body>
+</html>
