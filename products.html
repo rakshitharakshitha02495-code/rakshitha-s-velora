@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopEasy | Products</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:#f4f6f8;color:#333;line-height:1.6}
+header{background:#1e293b;color:#fff;padding:14px 30px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;flex-wrap:wrap}
+.logo{font-size:1.5rem;color:#fbbf24}
+nav a{color:#fff;text-decoration:none;margin-left:18px}
+nav a:hover,nav a.active{color:#fbbf24}
+.badge{background:#ef4444;border-radius:50%;padding:1px 7px;font-size:.8rem}
+main{max-width:1100px;margin:25px auto;padding:0 20px;min-height:60vh}
+.btn{background:#f59e0b;color:#fff;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:1rem}
+.btn:hover{background:#d97706}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px}
+.card{background:#fff;border-radius:10px;padding:20px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.card .img{font-size:4rem}
+.price{color:#16a34a;font-weight:bold;margin:6px 0}
+footer{background:#1e293b;color:#fff;text-align:center;padding:15px;margin-top:30px}
+.filters{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.filters input,.filters select{padding:10px;border:1px solid #ccc;border-radius:6px;font-size:1rem}
+.filters input{flex:1;min-width:200px}
+#empty{display:none;text-align:center;padding:30px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🛒 ShopEasy</div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="products.html" class="active">Products</a>
+    <a href="cart.html">Cart <span class="badge" id="cart-count">0</span></a>
+    <a href="login.html">Login</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+
+<main>
+  <h2 style="margin-bottom:15px">All Products</h2>
+  <div class="filters">
+    <input type="text" id="search" placeholder="Search products...">
+    <select id="category">
+      <option value="All">All Categories</option>
+      <option>Electronics</option>
+      <option>Fashion</option>
+      <option>Accessories</option>
+    </select>
+    <select id="sort">
+      <option value="">Sort by</option>
+      <option value="low">Price: Low to High</option>
+      <option value="high">Price: High to Low</option>
+    </select>
+  </div>
+  <div class="grid" id="products"></div>
+  <p id="empty">No products found.</p>
+</main>
+
+<footer><p>&copy; 2026 ShopEasy. All rights reserved.</p></footer>
+
+<script>
+const getCart=()=>JSON.parse(localStorage.getItem('cart')||'[]');
+const saveCart=c=>{localStorage.setItem('cart',JSON.stringify(c));updateCount();};
+function updateCount(){const el=document.getElementById('cart-count');if(el)el.textContent=getCart().reduce((s,i)=>s+i.qty,0);}
+function addToCart(p){const c=getCart();const f=c.find(i=>i.id===p.id);f?f.qty++:c.push({...p,qty:1});saveCart(c);alert(p.name+' added to cart');}
+updateCount();
+
+const products=[
+  {id:1,name:'Smartphone',price:14999,img:'📱',cat:'Electronics'},
+  {id:2,name:'Headphones',price:1999,img:'🎧',cat:'Electronics'},
+  {id:3,name:'Sneakers',price:2499,img:'👟',cat:'Fashion'},
+  {id:4,name:'Smart Watch',price:3499,img:'⌚',cat:'Accessories'},
+  {id:5,name:'Laptop',price:45999,img:'💻',cat:'Electronics'},
+  {id:6,name:'T-Shirt',price:499,img:'👕',cat:'Fashion'},
+  {id:7,name:'Sunglasses',price:799,img:'🕶️',cat:'Accessories'},
+  {id:8,name:'Backpack',price:1299,img:'🎒',cat:'Accessories'},
+  {id:9,name:'Jacket',price:2999,img:'🧥',cat:'Fashion'},
+  {id:10,name:'Camera',price:25999,img:'📷',cat:'Electronics'}
+];
+
+const grid=document.getElementById('products');
+const search=document.getElementById('search');
+const category=document.getElementById('category');
+const sort=document.getElementById('sort');
+
+// read ?cat= from URL (used by home page category links)
+const urlCat=new URLSearchParams(location.search).get('cat');
+if(urlCat) category.value=urlCat;
+
+function render(){
+  let list=products.filter(p=>
+    p.name.toLowerCase().includes(search.value.toLowerCase()) &&
+    (category.value==='All'||p.cat===category.value));
+  if(sort.value==='low') list.sort((a,b)=>a.price-b.price);
+  if(sort.value==='high') list.sort((a,b)=>b.price-a.price);
+
+  grid.innerHTML='';
+  document.getElementById('empty').style.display=list.length?'none':'block';
+  list.forEach(p=>{
+    const d=document.createElement('div');
+    d.className='card';
+    d.innerHTML=`<div class="img">${p.img}</div><h4>${p.name}</h4><small>${p.cat}</small><div class="price">₹${p.price}</div>`;
+    const b=document.createElement('button');
+    b.className='btn';b.textContent='Add to Cart';
+    b.onclick=()=>addToCart(p);
+    d.appendChild(b);grid.appendChild(d);
+  });
+}
+[search,category,sort].forEach(el=>el.addEventListener('input',render));
+render();
+</script>
+</body>
+</html>
